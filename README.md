@@ -5,6 +5,17 @@ It dont support no god damn secure boot, encryption or non-efistub entries. <br>
 It has one job... boot my linux kernels. And it does it well. <br>
 **13KB compiled**. No libraries. No bloat. Pure **suckless** nature. <br>
 
+<img width="6472" height="3635" alt="image" src="https://github.com/user-attachments/assets/365f6685-9cdb-458b-af3f-b58466a520f3" />
+
+
+# Usage
+
+If you have the timeout set to 0, the default slot will be automatically booted (around ~180ms) which is basiclly the same speed as a straight up efi boot entry. You can hold **SPACEBAR** to interupt this and access the menu at any time. I recommend this mode.<br>
+
+Use **arrow keys** to select a slot. Press **enter** to boot.<br>
+
+Press **D** to set a default slot graphically.
+
 # Build or Download binary
 
 Use the **precompiled binary** under releases, or you can build from source using the commands below:
