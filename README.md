@@ -1,9 +1,10 @@
 # Asterboot
 
 This is a **basic bitch** bootloader.<br>
-It dont support no god damn secure boot, encryption or non-efistub entries. <br>
+It dont support no god damn secure boot, encryption* or non-efistub entries. <br>
 It has one job... boot my linux kernels. And it does it well. <br>
 **13KB compiled**. No libraries. No bloat. Pure **suckless** nature. <br>
+<sub> *root partition encryption is supported as the initramfs handles decryption </sub>
 
 <img width="6472" height="3635" alt="image" src="https://github.com/user-attachments/assets/365f6685-9cdb-458b-af3f-b58466a520f3" />
 
