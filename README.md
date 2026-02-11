@@ -8,7 +8,7 @@ It doesn't support secure boot, encryption* or non-efistub entries. <br>
 <img width="6472" height="3635" alt="image" src="https://github.com/user-attachments/assets/365f6685-9cdb-458b-af3f-b58466a520f3" />
 
 
-# Usage
+## Usage
 
 #### Entering the menu:
 Timeout > 0: Countdown timer is shown. Any key interrupts timer.<br>
@@ -19,7 +19,7 @@ Timeout = 0: Boots default entry instantly. To interrupt and access the menu, Ho
 **Arrow keys** to select a slot. **Enter** to boot.<br>
 **D** to set a default slot graphically.
 
-# Build or Download binary
+## Build or Download binary
 
 Use the **precompiled binary** under releases, or you can **build from source** using the commands below:
 ```shell
@@ -28,7 +28,7 @@ cd asterboot
 clang -target x86_64-unknown-windows -ffreestanding -fshort-wchar -mno-red-zone -Wl,-entry:efi_main -fuse-ld=lld -Wl,-subsystem:efi_application -Wl,-nodefaultlib -o asterbootx64.efi main.c
 ```
 
-# Setup & Configure
+## Setup & Configure
 
 #### 1. Create the following file structure in your **root efi partition**
 
