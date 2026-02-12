@@ -584,13 +584,17 @@ void Boot(EFI_HANDLE ImageHandle) {
     ST->ConOut->ClearScreen(ST->ConOut);
     ST->ConOut->OutputString(ST->ConOut, CAST_STR(L"Loading Kernel...\r\n"));
 
-    EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
-    BS->HandleProtocol(ImageHandle, (EFI_GUID*)&EFI_LOADED_IMAGE_PROTOCOL_GUID, (void**)&LoadedImage);
+    // 1. Identify Self and Disk
+    EFI_LOADED_IMAGE_PROTOCOL *SelfLoaded;
+    BS->HandleProtocol(ImageHandle, (EFI_GUID*)&EFI_LOADED_IMAGE_PROTOCOL_GUID, (void**)&SelfLoaded);
+
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FS;
-    BS->HandleProtocol(LoadedImage->DeviceHandle, (EFI_GUID*)&EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID, (void**)&FS);
+    BS->HandleProtocol(SelfLoaded->DeviceHandle, (EFI_GUID*)&EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID, (void**)&FS);
+
     EFI_FILE_PROTOCOL *Root;
     FS->OpenVolume(FS, &Root);
 
+    // 2. Load Kernel to RAM
     void *KernelBuffer; UINTN KernelSize;
     if (EFI_ERROR(ReadFile(Root, E->Kernel, (char**)&KernelBuffer, &KernelSize))) {
         ST->ConOut->OutputString(ST->ConOut, CAST_STR(L"Error: Kernel not found.\r\n"));
@@ -598,26 +602,42 @@ void Boot(EFI_HANDLE ImageHandle) {
         BS->Stall(5000000); return;
     }
 
+    // 3. Create the Kernel Image
     EFI_HANDLE KernelHandle;
     EFI_STATUS Status = BS->LoadImage(FALSE, ImageHandle, NULL, KernelBuffer, KernelSize, &KernelHandle);
-    if (EFI_ERROR(Status)) { ST->ConOut->OutputString(ST->ConOut, CAST_STR(L"LoadImage Error\r\n")); BS->Stall(3000000); return; }
+    if (EFI_ERROR(Status)) {
+        ST->ConOut->OutputString(ST->ConOut, CAST_STR(L"LoadImage Error\r\n"));
+        BS->Stall(3000000); return;
+    }
 
-    EFI_LOADED_IMAGE_PROTOCOL *Loaded;
-    BS->HandleProtocol(KernelHandle, (EFI_GUID*)&EFI_LOADED_IMAGE_PROTOCOL_GUID, (void**)&Loaded);
+    // 4. Prepare the Kernel
+    EFI_LOADED_IMAGE_PROTOCOL *KernelLoaded;
+    BS->HandleProtocol(KernelHandle, (EFI_GUID*)&EFI_LOADED_IMAGE_PROTOCOL_GUID, (void**)&KernelLoaded);
 
+    // Since asterboot loads directly to ram, the firmware gave the kernel a NULL DeviceHandle
+    // So DeviceHandle has to be manually copied to the Kernel so it knows where to read initramfs from
+    KernelLoaded->DeviceHandle = SelfLoaded->DeviceHandle;
+
+    // 5. Set Command Line
     CHAR16 CmdLine[512]; CHAR16 *D=CmdLine, *S=E->Params;
     while(*S) *D++=*S++;
+
+    // Append Initrd
     if (StrLen(E->Initrd) > 0) {
         CHAR16 *I=CAST_STR(L" initrd="); while(*I) *D++=*I++;
         S=E->Initrd; while(*S) *D++=*S++;
     }
     *D=0;
-    Loaded->LoadOptionsSize = (StrLen(CmdLine)+1)*2;
-    Loaded->LoadOptions = CmdLine;
 
+    KernelLoaded->LoadOptionsSize = (StrLen(CmdLine)+1)*2;
+    KernelLoaded->LoadOptions = CmdLine;
+
+    // 6. Start
     Status = BS->StartImage(KernelHandle, NULL, NULL);
-    ST->ConOut->OutputString(ST->ConOut, CAST_STR(L"Kernel Returned\r\n"));
-    BS->Stall(5000000);
+
+    // Failure handling
+    ST->ConOut->OutputString(ST->ConOut, CAST_STR(L"Kernel Returned (Error)\r\n"));
+    BS->Stall(10000000);
 }
 
 EFI_STATUS EFIAPI efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
