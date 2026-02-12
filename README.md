@@ -1,9 +1,9 @@
 # Asterboot
 
-Asterboot is an extremely lightweight bootloader with one job... to boot kernels. <br>
-It doesn't support secure boot, encryption* or non-efistub entries. <br>
+Asterboot is an extremely lightweight UEFI bootloader with one job... to boot kernels. <br>
 **13KB compiled**. No libraries. No bloat. *Pure **suckless** nature.* <br>
-<sub> *root partition encryption is supported as the initramfs handles decryption </sub>
+Currently, Asterboot doesn't support secure boot. <br>
+<sub> Root partition encryption is supported as the initramfs handles decryption, full disk encryption **not** supported. </sub>
 
 <img width="6472" height="3635" alt="image" src="https://github.com/user-attachments/assets/365f6685-9cdb-458b-af3f-b58466a520f3" />
 
@@ -19,7 +19,7 @@ Timeout = 0: Boots default entry instantly. To interrupt and access the menu, Ho
 **Arrow keys** to select a slot. **Enter** to boot.<br>
 **D** to set a default slot graphically.
 
-## Build or Download binary
+## Build or Download binaryAnd that also means 
 
 Use the **precompiled binary** under releases, or you can **build from source** using the commands below:
 ```shell
