@@ -67,7 +67,7 @@ sudo efibootmgr --create --disk /dev/nvme0n1 --part 1 --label "Asterboot" --load
 ```
 ## Optional Secureboot:
 If you wish to utilize **secureboot**, you must generate a keypair and certificate, and use it to sign the bootloader and your kernel.<br>
-You will need `openssl`, `sbsigntools` and `sbsigntools`.
+You will need `openssl`, `sbsigntools` and `sbsigntools`.<br>
 <sub> **Note:** It may be possible to use a microsoft signed SHIM instead, but this is untested and probably won't work. </sub>
 
 #### 1. Create a workspace and generate the keys:
