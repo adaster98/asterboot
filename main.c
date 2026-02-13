@@ -1,7 +1,8 @@
 #include <stdint.h>
 
-/* --- UEFI BASE DEFINITIONS --- */
+/* --- UEFI BASIC TYPES & DEFINITIONS --- */
 #define EFIAPI __attribute__((ms_abi))
+
 typedef uint64_t EFI_STATUS;
 typedef void *EFI_HANDLE;
 typedef void *EFI_EVENT;
@@ -12,7 +13,13 @@ typedef uint16_t UINT16;
 typedef uint32_t UINT32;
 typedef int16_t INT16;
 typedef uint8_t BOOLEAN;
-typedef struct { uint32_t Data1; uint16_t Data2; uint16_t Data3; uint8_t Data4[8]; } EFI_GUID;
+
+typedef struct {
+    uint32_t Data1;
+    uint16_t Data2;
+    uint16_t Data3;
+    uint8_t Data4[8];
+} EFI_GUID;
 
 #define EFI_SUCCESS 0
 #define EFI_ERROR(s) ((int64_t)(s) < 0)
@@ -28,11 +35,14 @@ typedef enum {
     EfiResetPlatformSpecific
 } EFI_RESET_TYPE;
 
+/* --- FORWARD DECLARATIONS --- */
 struct _EFI_SYSTEM_TABLE;
 struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
-/* --- PROTOCOLS --- */
+/* --- PROTOCOL DEFINITIONS --- */
+
+/* Text Output Protocol */
 typedef struct {
     int32_t MaxMode;
     int32_t Mode;
@@ -42,14 +52,14 @@ typedef struct {
     BOOLEAN CursorVisible;
 } EFI_SIMPLE_TEXT_OUTPUT_MODE;
 
-typedef EFI_STATUS (EFIAPI *EFI_TEXT_RESET)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, BOOLEAN ExtendedVerification);
-typedef EFI_STATUS (EFIAPI *EFI_TEXT_OUTPUT_STRING)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, CHAR16 *String);
-typedef EFI_STATUS (EFIAPI *EFI_TEXT_QUERY_MODE)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN ModeNumber, UINTN *Columns, UINTN *Rows);
-typedef EFI_STATUS (EFIAPI *EFI_TEXT_SET_MODE)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN ModeNumber);
-typedef EFI_STATUS (EFIAPI *EFI_TEXT_SET_ATTRIBUTE)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN Attribute);
-typedef EFI_STATUS (EFIAPI *EFI_TEXT_CLEAR_SCREEN)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This);
-typedef EFI_STATUS (EFIAPI *EFI_TEXT_SET_CURSOR_POSITION)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN Column, UINTN Row);
-typedef EFI_STATUS (EFIAPI *EFI_TEXT_ENABLE_CURSOR)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, BOOLEAN Visible);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_RESET)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, BOOLEAN ExtendedVerification);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_OUTPUT_STRING)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, CHAR16 *String);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_QUERY_MODE)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN ModeNumber, UINTN *Columns, UINTN *Rows);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_MODE)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN ModeNumber);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_ATTRIBUTE)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN Attribute);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_CLEAR_SCREEN)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_SET_CURSOR_POSITION)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN Column, UINTN Row);
+typedef EFI_STATUS(EFIAPI *EFI_TEXT_ENABLE_CURSOR)(struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, BOOLEAN Visible);
 
 typedef struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
     EFI_TEXT_RESET Reset;
@@ -64,13 +74,14 @@ typedef struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
     EFI_SIMPLE_TEXT_OUTPUT_MODE *Mode;
 } EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 
+/* Input Protocol */
 typedef struct {
     uint16_t ScanCode;
     uint16_t UnicodeChar;
 } EFI_INPUT_KEY;
 
-typedef EFI_STATUS (EFIAPI *EFI_INPUT_RESET)(struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This, BOOLEAN ExtendedVerification);
-typedef EFI_STATUS (EFIAPI *EFI_INPUT_READ_KEY)(struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This, EFI_INPUT_KEY *Key);
+typedef EFI_STATUS(EFIAPI *EFI_INPUT_RESET)(struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This, BOOLEAN ExtendedVerification);
+typedef EFI_STATUS(EFIAPI *EFI_INPUT_READ_KEY)(struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This, EFI_INPUT_KEY *Key);
 
 typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
     EFI_INPUT_RESET Reset;
@@ -78,6 +89,7 @@ typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
     void *WaitForKey;
 } EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
+/* File System Protocols */
 #define EFI_FILE_MODE_READ 0x0000000000000001
 #define EFI_FILE_MODE_WRITE 0x0000000000000002
 #define EFI_FILE_MODE_CREATE 0x8000000000000000
@@ -108,12 +120,12 @@ typedef struct {
 } EFI_FILE_INFO;
 
 struct _EFI_FILE_PROTOCOL;
-typedef EFI_STATUS (EFIAPI *EFI_FILE_OPEN)(struct _EFI_FILE_PROTOCOL *This, struct _EFI_FILE_PROTOCOL **NewHandle, CHAR16 *FileName, uint64_t OpenMode, uint64_t Attributes);
-typedef EFI_STATUS (EFIAPI *EFI_FILE_CLOSE)(struct _EFI_FILE_PROTOCOL *This);
-typedef EFI_STATUS (EFIAPI *EFI_FILE_DELETE)(struct _EFI_FILE_PROTOCOL *This);
-typedef EFI_STATUS (EFIAPI *EFI_FILE_READ)(struct _EFI_FILE_PROTOCOL *This, UINTN *BufferSize, void *Buffer);
-typedef EFI_STATUS (EFIAPI *EFI_FILE_WRITE)(struct _EFI_FILE_PROTOCOL *This, UINTN *BufferSize, void *Buffer);
-typedef EFI_STATUS (EFIAPI *EFI_FILE_GET_INFO)(struct _EFI_FILE_PROTOCOL *This, EFI_GUID *InformationType, UINTN *BufferSize, void *Buffer);
+typedef EFI_STATUS(EFIAPI *EFI_FILE_OPEN)(struct _EFI_FILE_PROTOCOL *This, struct _EFI_FILE_PROTOCOL **NewHandle, CHAR16 *FileName, uint64_t OpenMode, uint64_t Attributes);
+typedef EFI_STATUS(EFIAPI *EFI_FILE_CLOSE)(struct _EFI_FILE_PROTOCOL *This);
+typedef EFI_STATUS(EFIAPI *EFI_FILE_DELETE)(struct _EFI_FILE_PROTOCOL *This);
+typedef EFI_STATUS(EFIAPI *EFI_FILE_READ)(struct _EFI_FILE_PROTOCOL *This, UINTN *BufferSize, void *Buffer);
+typedef EFI_STATUS(EFIAPI *EFI_FILE_WRITE)(struct _EFI_FILE_PROTOCOL *This, UINTN *BufferSize, void *Buffer);
+typedef EFI_STATUS(EFIAPI *EFI_FILE_GET_INFO)(struct _EFI_FILE_PROTOCOL *This, EFI_GUID *InformationType, UINTN *BufferSize, void *Buffer);
 
 typedef struct _EFI_FILE_PROTOCOL {
     uint64_t Revision;
@@ -129,9 +141,10 @@ typedef struct _EFI_FILE_PROTOCOL {
 
 typedef struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
     uint64_t Revision;
-    EFI_STATUS (EFIAPI *OpenVolume)(struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This, EFI_FILE_PROTOCOL **Root);
+    EFI_STATUS(EFIAPI *OpenVolume)(struct _EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This, EFI_FILE_PROTOCOL **Root);
 } EFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
 
+/* Image Loading Protocols */
 typedef struct {
     uint32_t Revision;
     EFI_HANDLE ParentHandle;
@@ -145,18 +158,19 @@ typedef struct {
     uint64_t ImageSize;
 } EFI_LOADED_IMAGE_PROTOCOL;
 
-typedef EFI_STATUS (EFIAPI *EFI_LOCATE_PROTOCOL)(EFI_GUID *Protocol, void *Registration, void **Interface);
-typedef EFI_STATUS (EFIAPI *EFI_ALLOCATE_POOL)(int PoolType, UINTN Size, void **Buffer);
-typedef EFI_STATUS (EFIAPI *EFI_FREE_POOL)(void *Buffer);
-typedef EFI_STATUS (EFIAPI *EFI_HANDLE_PROTOCOL)(EFI_HANDLE Handle, EFI_GUID *Protocol, void **Interface);
-typedef EFI_STATUS (EFIAPI *EFI_LOAD_IMAGE)(BOOLEAN BootPolicy, EFI_HANDLE ParentImageHandle, void *DevicePath, void *SourceBuffer, UINTN SourceSize, EFI_HANDLE *ImageHandle);
-typedef EFI_STATUS (EFIAPI *EFI_START_IMAGE)(EFI_HANDLE ImageHandle, UINTN *ExitDataSize, CHAR16 **ExitData);
-typedef EFI_STATUS (EFIAPI *EFI_WAIT_FOR_EVENT)(UINTN NumberOfEvents, EFI_EVENT *Event, UINTN *Index);
-typedef EFI_STATUS (EFIAPI *EFI_STALL)(UINTN Microseconds);
-typedef EFI_STATUS (EFIAPI *EFI_SET_WATCHDOG_TIMER)(UINTN Timeout, uint64_t WatchdogCode, UINTN DataSize, CHAR16 *WatchdogData);
-typedef EFI_STATUS (EFIAPI *EFI_RESET_SYSTEM)(EFI_RESET_TYPE ResetType, EFI_STATUS ResetStatus, UINTN DataSize, void *ResetData);
-typedef EFI_STATUS (EFIAPI *EFI_GET_VARIABLE)(CHAR16 *VariableName, EFI_GUID *VendorGuid, UINT32 *Attributes, UINTN *DataSize, void *Data);
-typedef EFI_STATUS (EFIAPI *EFI_SET_VARIABLE)(CHAR16 *VariableName, EFI_GUID *VendorGuid, UINT32 Attributes, UINTN DataSize, void *Data);
+/* Boot Services Defs */
+typedef EFI_STATUS(EFIAPI *EFI_LOCATE_PROTOCOL)(EFI_GUID *Protocol, void *Registration, void **Interface);
+typedef EFI_STATUS(EFIAPI *EFI_ALLOCATE_POOL)(int PoolType, UINTN Size, void **Buffer);
+typedef EFI_STATUS(EFIAPI *EFI_FREE_POOL)(void *Buffer);
+typedef EFI_STATUS(EFIAPI *EFI_HANDLE_PROTOCOL)(EFI_HANDLE Handle, EFI_GUID *Protocol, void **Interface);
+typedef EFI_STATUS(EFIAPI *EFI_LOAD_IMAGE)(BOOLEAN BootPolicy, EFI_HANDLE ParentImageHandle, void *DevicePath, void *SourceBuffer, UINTN SourceSize, EFI_HANDLE *ImageHandle);
+typedef EFI_STATUS(EFIAPI *EFI_START_IMAGE)(EFI_HANDLE ImageHandle, UINTN *ExitDataSize, CHAR16 **ExitData);
+typedef EFI_STATUS(EFIAPI *EFI_WAIT_FOR_EVENT)(UINTN NumberOfEvents, EFI_EVENT *Event, UINTN *Index);
+typedef EFI_STATUS(EFIAPI *EFI_STALL)(UINTN Microseconds);
+typedef EFI_STATUS(EFIAPI *EFI_SET_WATCHDOG_TIMER)(UINTN Timeout, uint64_t WatchdogCode, UINTN DataSize, CHAR16 *WatchdogData);
+typedef EFI_STATUS(EFIAPI *EFI_RESET_SYSTEM)(EFI_RESET_TYPE ResetType, EFI_STATUS ResetStatus, UINTN DataSize, void *ResetData);
+typedef EFI_STATUS(EFIAPI *EFI_GET_VARIABLE)(CHAR16 *VariableName, EFI_GUID *VendorGuid, UINT32 *Attributes, UINTN *DataSize, void *Data);
+typedef EFI_STATUS(EFIAPI *EFI_SET_VARIABLE)(CHAR16 *VariableName, EFI_GUID *VendorGuid, UINT32 Attributes, UINTN DataSize, void *Data);
 
 typedef struct {
     char Header[24];
@@ -200,6 +214,7 @@ typedef struct {
     EFI_LOCATE_PROTOCOL LocateProtocol;
 } EFI_BOOT_SERVICES;
 
+/* EFI_RUNTIME_SERVICES */
 typedef struct {
     char Header[24];
     void *GetTime;
@@ -232,11 +247,13 @@ typedef struct _EFI_SYSTEM_TABLE {
     EFI_BOOT_SERVICES *BootServices;
 } EFI_SYSTEM_TABLE;
 
+/* --- GUIDS --- */
 static const EFI_GUID EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID = { 0x0964e5b22, 0x6459, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b} };
 static const EFI_GUID EFI_FILE_INFO_ID = { 0x09576e92, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b} };
 static const EFI_GUID EFI_LOADED_IMAGE_PROTOCOL_GUID = { 0x5B1B31A1, 0x9562, 0x11d2, {0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B} };
 static const EFI_GUID EFI_GLOBAL_VARIABLE = { 0x8BE4DF61, 0x93CA, 0x11D2, {0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C} };
 
+/* --- GLOBALS --- */
 EFI_SYSTEM_TABLE *ST;
 EFI_BOOT_SERVICES *BS;
 EFI_RUNTIME_SERVICES *RT;
@@ -264,9 +281,10 @@ BootEntry Entries[MAX_ENTRIES];
 UINTN EntryCount = 0;
 GlobalConfig Config;
 UINTN SelectedIndex = 0;
-UINTN WindowStart = 0;
+UINTN WindowStart = 0; // Tracks scroll position
 CHAR16 DebugLog[2048] = {0};
 
+/* --- COLORS --- */
 #define EFI_BLACK 0x00
 #define EFI_BLUE  0x01
 #define EFI_GREEN 0x02
@@ -288,10 +306,10 @@ CHAR16 DebugLog[2048] = {0};
 #define BG_LIGHTGRAY 0x70
 #define BG_MAGENTA 0x50
 
-/* --- HELPERS --- */
-UINTN StrLen(CHAR16 *Str) { UINTN L=0; while(*Str++) L++; return L; }
-void StrCpy(CHAR16 *D, CHAR16 *S) { while(*S) *D++ = *S++; *D=0; }
-int StrCmp(CHAR16 *A, CHAR16 *B) { while(*A && *B) { if (*A!=*B) return *A-*B; A++; B++; } return *A-*B; }
+/* --- STRING HELPERS --- */
+UINTN StrLen(CHAR16 *Str) { UINTN L = 0; while (*Str++) L++; return L; }
+void StrCpy(CHAR16 *D, CHAR16 *S) { while (*S) *D++ = *S++; *D = 0; }
+int StrCmp(CHAR16 *A, CHAR16 *B) { while (*A && *B) { if (*A != *B) return *A - *B; A++; B++; } return *A - *B; }
 
 void StrCat(CHAR16 *Dest, CHAR16 *Src) {
     while (*Dest) Dest++;
@@ -299,13 +317,15 @@ void StrCat(CHAR16 *Dest, CHAR16 *Src) {
     *Dest = 0;
 }
 
-UINTN AsciiStrLen(const char *Str) { UINTN L=0; while(*Str++) L++; return L; }
-int AsciiStrnCmp(const char *A, const char *B, UINTN N) { while(N>0 && *A && *B) { if(*A!=*B) return *A-*B; A++; B++; N--; } if(N==0) return 0; return *A-*B; }
-UINTN AsciiToInt(const char *Str) { UINTN N=0; while(*Str>='0' && *Str<='9') { N=N*10+(*Str-'0'); Str++; } return N; }
-char* AsciiFindNextLine(char *S) { while(*S) { if(*S=='\n') return S; S++; } return NULL; }
+UINTN AsciiStrLen(const char *Str) { UINTN L = 0; while (*Str++) L++; return L; }
+int AsciiStrnCmp(const char *A, const char *B, UINTN N) { while (N > 0 && *A && *B) { if (*A != *B) return *A - *B; A++; B++; N--; } if (N == 0) return 0; return *A - *B; }
+UINTN AsciiToInt(const char *Str) { UINTN N = 0; while (*Str >= '0' && *Str <= '9') { N = N * 10 + (*Str - '0'); Str++; } return N; }
+char* AsciiFindNextLine(char *S) { while (*S) { if (*S == '\n') return S; S++; } return NULL; }
 
-/* --- RESOLUTION OPTIMISER --- */
-// I found that max res was too hard to read so this finds the mode closest to ~100-120 cols.
+/* * Resolution Optimizer
+ * Finds the resolution closest to ~100 columns width.
+ * Standard "Max" resolution on 4K is often too small to read comfortably.
+ */
 void SetBestResolution() {
     UINTN ModeCount = ST->ConOut->Mode->MaxMode;
     UINTN BestMode = 0;
@@ -324,15 +344,16 @@ void SetBestResolution() {
     ST->ConOut->ClearScreen(ST->ConOut);
 }
 
-/* --- SYSTEM UTILS --- */
+/* --- SYSTEM UTILITIES --- */
 void Reboot() {
     RT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
 }
 
 void EnterSetup() {
-    uint64_t OsInd = 0x0000000000000001;
+    uint64_t OsInd = 0x0000000000000001; // EFI_OS_INDICATIONS_BOOT_TO_FW_UI
+    // Request firmware setup on next boot via standard global variable
     RT->SetVariable(CAST_STR(L"OsIndications"), (EFI_GUID*)&EFI_GLOBAL_VARIABLE,
-                    0x00000007, // NV | BS | RT
+                    0x00000007, // Attributes: NonVolatile | BootServices | Runtime
                     sizeof(uint64_t), &OsInd);
     Reboot();
 }
@@ -342,21 +363,27 @@ EFI_STATUS ReadFile(EFI_FILE_PROTOCOL *Root, CHAR16 *Path, char **Buffer, UINTN 
     EFI_FILE_PROTOCOL *File;
     EFI_STATUS Status = Root->Open(Root, &File, Path, EFI_FILE_MODE_READ, 0);
     if (EFI_ERROR(Status)) return Status;
+
     EFI_FILE_INFO *Info;
     UINTN InfoSize = 0;
+
+    // Get info size first, then allocate and read
     File->GetInfo(File, (EFI_GUID*)&EFI_FILE_INFO_ID, &InfoSize, NULL);
     BS->AllocatePool(2, InfoSize, (void**)&Info);
     File->GetInfo(File, (EFI_GUID*)&EFI_FILE_INFO_ID, &InfoSize, Info);
+
     *Size = Info->FileSize;
     BS->FreePool(Info);
+
+    // Read file content
     BS->AllocatePool(2, *Size + 1, (void**)Buffer);
     Status = File->Read(File, Size, *Buffer);
-    (*Buffer)[*Size] = 0;
+    (*Buffer)[*Size] = 0; // Null terminate
     File->Close(File);
     return Status;
 }
 
-/* --- PARSER --- */
+/* --- CONFIG PARSER --- */
 int KeyMatch(char *Line, const char *Key) {
     while (*Line == ' ' || *Line == '\t') Line++;
     UINTN KeyLen = AsciiStrLen(Key);
@@ -382,27 +409,23 @@ void ParseSlot(CHAR16 *Name, char *Buffer) {
         Next = AsciiFindNextLine(Line);
         if (Next) *Next = 0;
         int Len = AsciiStrLen(Line);
-        if (Len > 0 && Line[Len-1] == '\r') Line[Len-1] = 0;
+        if (Len > 0 && Line[Len - 1] == '\r') Line[Len - 1] = 0;
 
         if (KeyMatch(Line, "TITLE")) {
             char *V = GetVal(Line, "TITLE");
-            for(int i=0; V[i]; i++) E->Title[i]=(CHAR16)V[i]; E->Title[AsciiStrLen(V)]=0;
-        }
-        else if (KeyMatch(Line, "VERSION")) {
+            for (int i = 0; V[i]; i++) E->Title[i] = (CHAR16)V[i]; E->Title[AsciiStrLen(V)] = 0;
+        } else if (KeyMatch(Line, "VERSION")) {
             char *V = GetVal(Line, "VERSION");
-            for(int i=0; V[i]; i++) E->Version[i]=(CHAR16)V[i]; E->Version[AsciiStrLen(V)]=0;
-        }
-        else if (KeyMatch(Line, "KERNEL")) {
+            for (int i = 0; V[i]; i++) E->Version[i] = (CHAR16)V[i]; E->Version[AsciiStrLen(V)] = 0;
+        } else if (KeyMatch(Line, "KERNEL")) {
             char *V = GetVal(Line, "KERNEL");
-            for(int i=0; V[i]; i++) E->Kernel[i]=(CHAR16)V[i]; E->Kernel[AsciiStrLen(V)]=0;
-        }
-        else if (KeyMatch(Line, "INITRD")) {
+            for (int i = 0; V[i]; i++) E->Kernel[i] = (CHAR16)V[i]; E->Kernel[AsciiStrLen(V)] = 0;
+        } else if (KeyMatch(Line, "INITRD")) {
             char *V = GetVal(Line, "INITRD");
-            for(int i=0; V[i]; i++) E->Initrd[i]=(CHAR16)V[i]; E->Initrd[AsciiStrLen(V)]=0;
-        }
-        else if (KeyMatch(Line, "PARAMS")) {
+            for (int i = 0; V[i]; i++) E->Initrd[i] = (CHAR16)V[i]; E->Initrd[AsciiStrLen(V)] = 0;
+        } else if (KeyMatch(Line, "PARAMS")) {
             char *V = GetVal(Line, "PARAMS");
-            for(int i=0; V[i]; i++) E->Params[i]=(CHAR16)V[i]; E->Params[AsciiStrLen(V)]=0;
+            for (int i = 0; V[i]; i++) E->Params[i] = (CHAR16)V[i]; E->Params[AsciiStrLen(V)] = 0;
         }
 
         if (Next) Line = Next + 1; else break;
@@ -412,12 +435,15 @@ void ParseSlot(CHAR16 *Name, char *Buffer) {
 void DetectRoot(EFI_FILE_PROTOCOL *Vol) {
     EFI_FILE_PROTOCOL *Test;
     StrCpy(DebugLog, CAST_STR(L"DEBUG LOG:\n"));
+
+    // Check root directory
     if (!EFI_ERROR(Vol->Open(Vol, &Test, CAST_STR(L"\\asterboot"), EFI_FILE_MODE_READ, 0))) {
         ActiveRoot = CAST_STR(L"\\asterboot");
         StrCat(DebugLog, CAST_STR(L"Found Root: \\asterboot\n"));
         Test->Close(Test);
         return;
     }
+    // Check EFI directory fallback
     if (!EFI_ERROR(Vol->Open(Vol, &Test, CAST_STR(L"\\EFI\\asterboot"), EFI_FILE_MODE_READ, 0))) {
         ActiveRoot = CAST_STR(L"\\EFI\\asterboot");
         StrCat(DebugLog, CAST_STR(L"Found Root: \\EFI\\asterboot\n"));
@@ -429,21 +455,24 @@ void DetectRoot(EFI_FILE_PROTOCOL *Vol) {
 
 void LoadAll(EFI_FILE_PROTOCOL *Vol) {
     if (!ActiveRoot) return;
+
+    // 1. Load Main Config
     CHAR16 CfgPath[128];
     StrCpy(CfgPath, ActiveRoot);
     StrCat(CfgPath, CAST_STR(L"\\asterboot.conf"));
     char *Buf; UINTN Sz;
+
     if (!EFI_ERROR(ReadFile(Vol, CfgPath, &Buf, &Sz))) {
         char *L = Buf, *Nx;
-        while(L && *L) {
-            Nx = AsciiFindNextLine(L); if(Nx) *Nx=0;
-            if (KeyMatch(L, "TIMEOUT")) Config.Timeout=AsciiToInt(GetVal(L, "TIMEOUT"));
+        while (L && *L) {
+            Nx = AsciiFindNextLine(L); if (Nx) *Nx = 0;
+            if (KeyMatch(L, "TIMEOUT")) Config.Timeout = AsciiToInt(GetVal(L, "TIMEOUT"));
             else if (KeyMatch(L, "DEFAULT")) {
-                char *V=GetVal(L, "DEFAULT"); if(V[AsciiStrLen(V)-1]=='\r') V[AsciiStrLen(V)-1]=0;
-                for(int i=0; V[i]; i++) Config.DefaultSlot[i]=(CHAR16)V[i];
-                Config.DefaultSlot[AsciiStrLen(V)]=0;
+                char *V = GetVal(L, "DEFAULT"); if (V[AsciiStrLen(V) - 1] == '\r') V[AsciiStrLen(V) - 1] = 0;
+                for (int i = 0; V[i]; i++) Config.DefaultSlot[i] = (CHAR16)V[i];
+                Config.DefaultSlot[AsciiStrLen(V)] = 0;
             }
-            if(Nx) L=Nx+1; else break;
+            if (Nx) L = Nx + 1; else break;
         }
         BS->FreePool(Buf);
     } else {
@@ -451,28 +480,35 @@ void LoadAll(EFI_FILE_PROTOCOL *Vol) {
         StrCat(DebugLog, CAST_STR(L"WARN: No config file\n"));
     }
 
+    // 2. Load Slot Files
     CHAR16 SlotPath[128];
     StrCpy(SlotPath, ActiveRoot);
     StrCat(SlotPath, CAST_STR(L"\\slots"));
+
     EFI_FILE_PROTOCOL *Dir;
     if (EFI_ERROR(Vol->Open(Vol, &Dir, SlotPath, EFI_FILE_MODE_READ, 0))) {
         StrCat(DebugLog, CAST_STR(L"ERR: Slots dir missing\n"));
         return;
     }
+
     UINTN InfoSz = 2048;
     EFI_FILE_INFO *Info;
     BS->AllocatePool(2, InfoSz, (void**)&Info);
+
     StrCat(DebugLog, CAST_STR(L"Scanning Slots:\n"));
-    while(1) {
+    while (1) {
         InfoSz = 2048;
-        if (EFI_ERROR(Dir->Read(Dir, &InfoSz, Info)) || InfoSz==0) break;
+        if (EFI_ERROR(Dir->Read(Dir, &InfoSz, Info)) || InfoSz == 0) break;
         if (Info->FileName[0] == '.') continue;
+
         StrCat(DebugLog, CAST_STR(L" - "));
         StrCat(DebugLog, Info->FileName);
+
         CHAR16 FullPath[256];
         StrCpy(FullPath, SlotPath);
         StrCat(FullPath, CAST_STR(L"\\"));
         StrCat(FullPath, Info->FileName);
+
         if (!EFI_ERROR(ReadFile(Vol, FullPath, &Buf, &Sz))) {
             ParseSlot(Info->FileName, Buf);
             BS->FreePool(Buf);
@@ -490,20 +526,23 @@ void WriteDefault(EFI_FILE_PROTOCOL *Vol) {
     CHAR16 CfgPath[128];
     StrCpy(CfgPath, ActiveRoot);
     StrCat(CfgPath, CAST_STR(L"\\asterboot.conf"));
+
     EFI_FILE_PROTOCOL *File;
-    if (EFI_ERROR(Vol->Open(Vol, &File, CfgPath, EFI_FILE_MODE_CREATE|EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 0))) return;
-    char Buffer[128]; char *P=Buffer;
-    char *T="TIMEOUT="; while(*T) *P++=*T++;
-    if(Config.Timeout>9) *P++='0'+(Config.Timeout/10); *P++='0'+(Config.Timeout%10); *P++='\n';
-    T="DEFAULT="; while(*T) *P++=*T++;
-    CHAR16 *S=Entries[SelectedIndex].FileName; while(*S) *P++=(char)(*S++); *P++='\n'; *P=0;
-    UINTN Len = (UINTN)(P-Buffer);
+    if (EFI_ERROR(Vol->Open(Vol, &File, CfgPath, EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE, 0))) return;
+
+    char Buffer[128]; char *P = Buffer;
+    char *T = "TIMEOUT="; while (*T) *P++ = *T++;
+    if (Config.Timeout > 9) *P++ = '0' + (Config.Timeout / 10); *P++ = '0' + (Config.Timeout % 10); *P++ = '\n';
+    T = "DEFAULT="; while (*T) *P++ = *T++;
+    CHAR16 *S = Entries[SelectedIndex].FileName; while (*S) *P++ = (char)(*S++); *P++ = '\n'; *P = 0;
+
+    UINTN Len = (UINTN)(P - Buffer);
     File->Write(File, &Len, Buffer);
     File->Close(File);
     StrCpy(Config.DefaultSlot, Entries[SelectedIndex].FileName);
 }
 
-/* --- UI --- */
+/* --- UI DRAWING --- */
 void PrintAt(UINTN Col, UINTN Row, UINTN Attr, CHAR16 *Str) {
     ST->ConOut->SetAttribute(ST->ConOut, Attr);
     ST->ConOut->SetCursorPosition(ST->ConOut, Col, Row);
@@ -514,10 +553,11 @@ void DrawMenu(UINTN Timer) {
     ST->ConOut->SetAttribute(ST->ConOut, EFI_LIGHTGRAY | BG_BLACK);
     ST->ConOut->ClearScreen(ST->ConOut);
 
-    // Get Screen Dims
+    // Get Screen Dimensions
     UINTN Cols, Rows;
     ST->ConOut->QueryMode(ST->ConOut, ST->ConOut->Mode->Mode, &Cols, &Rows);
 
+    // Calculate Vertical Centering
     UINTN TitleH = 5;
     UINTN HeaderH = 2;
     UINTN VisibleCount = (EntryCount < MAX_VISIBLE) ? EntryCount : MAX_VISIBLE;
@@ -541,12 +581,12 @@ void DrawMenu(UINTN Timer) {
     UINTN HX = (Cols > HWidth) ? (Cols - HWidth) / 2 : 0;
     ST->ConOut->SetAttribute(ST->ConOut, BG_LIGHTGRAY | EFI_BLACK);
     ST->ConOut->SetCursorPosition(ST->ConOut, HX, R);
-    for(UINTN k=0; k<HWidth; k++) ST->ConOut->OutputString(ST->ConOut, CAST_STR(L" "));
+    for (UINTN k = 0; k < HWidth; k++) ST->ConOut->OutputString(ST->ConOut, CAST_STR(L" "));
     PrintAt(HX + 2, R, BG_LIGHTGRAY | EFI_BLACK, CAST_STR(L"SLOTS:"));
 
     if (EntryCount > MAX_VISIBLE) {
-        if (WindowStart > 0) PrintAt(HX+HWidth-3, R, BG_LIGHTGRAY | EFI_BLACK, CAST_STR(L"↑"));
-        if (WindowStart + MAX_VISIBLE < EntryCount) PrintAt(HX+HWidth-2, R, BG_LIGHTGRAY | EFI_BLACK, CAST_STR(L"↓"));
+        if (WindowStart > 0) PrintAt(HX + HWidth - 3, R, BG_LIGHTGRAY | EFI_BLACK, CAST_STR(L"↑"));
+        if (WindowStart + MAX_VISIBLE < EntryCount) PrintAt(HX + HWidth - 2, R, BG_LIGHTGRAY | EFI_BLACK, CAST_STR(L"↓"));
     }
     R++;
 
@@ -555,6 +595,7 @@ void DrawMenu(UINTN Timer) {
         PrintAt(CX, R++, EFI_LIGHTRED | BG_BLACK, CAST_STR(L"NO BOOT ENTRIES FOUND!"));
     }
 
+    // Loop through only the visible window of entries
     UINTN End = WindowStart + MAX_VISIBLE;
     if (End > EntryCount) End = EntryCount;
 
@@ -565,31 +606,31 @@ void DrawMenu(UINTN Timer) {
 
         UINTN RelR = R + (i - WindowStart);
 
-        if (IsDef) PrintAt(HX+2, RelR, EFI_LIGHTGREEN | BG_BLACK, CAST_STR(L"D"));
-        if (IsSel) PrintAt(HX+6, RelR, EFI_LIGHTMAGENTA | BG_BLACK, CAST_STR(L">"));
+        if (IsDef) PrintAt(HX + 2, RelR, EFI_LIGHTGREEN | BG_BLACK, CAST_STR(L"D"));
+        if (IsSel) PrintAt(HX + 6, RelR, EFI_LIGHTMAGENTA | BG_BLACK, CAST_STR(L">"));
 
         ST->ConOut->SetAttribute(ST->ConOut, TextAttr);
-        ST->ConOut->SetCursorPosition(ST->ConOut, HX+10, RelR);
+        ST->ConOut->SetCursorPosition(ST->ConOut, HX + 10, RelR);
 
-        CHAR16 Line[128]; CHAR16 *D=Line, *S=Entries[i].Title;
-        while(*S) *D++=*S++; *D++=' '; *D++='(';
-        S=Entries[i].Version; while(*S) *D++=*S++; *D++=')'; *D=0;
+        CHAR16 Line[128]; CHAR16 *D = Line, *S = Entries[i].Title;
+        while (*S) *D++ = *S++; *D++ = ' '; *D++ = '(';
+        S = Entries[i].Version; while (*S) *D++ = *S++; *D++ = ')'; *D = 0;
         ST->ConOut->OutputString(ST->ConOut, Line);
     }
 
     // --- BOTTOM BAR ---
     ST->ConOut->SetAttribute(ST->ConOut, EFI_WHITE | BG_BLACK);
-    ST->ConOut->SetCursorPosition(ST->ConOut, 0, Rows-1);
+    ST->ConOut->SetCursorPosition(ST->ConOut, 0, Rows - 1);
 
-    CHAR16 Status[128]; CHAR16 *T=Status, *Msg=(Timer>0)?CAST_STR(L" Booting in "):CAST_STR(L" UP/DOWN: Select | ENTER: Boot | U: BIOS | ESC: Reboot");
-    while(*Msg) *T++=*Msg++;
-    if (Timer>0) { if(Timer>9) *T++='0'+(Timer/10); *T++='0'+(Timer%10); Msg=CAST_STR(L" sec... | SPACE: Interrupt"); while(*Msg) *T++=*Msg++; }
-    *T=0;
+    CHAR16 Status[128]; CHAR16 *T = Status, *Msg = (Timer > 0) ? CAST_STR(L" Booting in ") : CAST_STR(L" UP/DOWN: Select | ENTER: Boot | U: BIOS | ESC: Reboot");
+    while (*Msg) *T++ = *Msg++;
+    if (Timer > 0) { if (Timer > 9) *T++ = '0' + (Timer / 10); *T++ = '0' + (Timer % 10); Msg = CAST_STR(L" sec... | SPACE: Interrupt"); while (*Msg) *T++ = *Msg++; }
+    *T = 0;
 
     UINTN SLen = StrLen(Status);
     UINTN SX = (Cols > SLen) ? (Cols - SLen) / 2 : 0;
-    PrintAt(0, Rows-2, EFI_DARKGRAY | BG_BLACK, CAST_STR(L"____________________________________________________________________________________________________"));
-    PrintAt(SX, Rows-1, EFI_LIGHTCYAN | BG_BLACK, Status);
+    PrintAt(0, Rows - 2, EFI_DARKGRAY | BG_BLACK, CAST_STR(L"____________________________________________________________________________________________________"));
+    PrintAt(SX, Rows - 1, EFI_LIGHTCYAN | BG_BLACK, Status);
 }
 
 void Boot(EFI_HANDLE ImageHandle) {
@@ -597,7 +638,7 @@ void Boot(EFI_HANDLE ImageHandle) {
     ST->ConOut->ClearScreen(ST->ConOut);
     ST->ConOut->OutputString(ST->ConOut, CAST_STR(L"Loading Kernel...\r\n"));
 
-    // 1. Identify Self and Disk
+    // 1. Identify Disk and FileSystem
     EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
     BS->HandleProtocol(ImageHandle, (EFI_GUID*)&EFI_LOADED_IMAGE_PROTOCOL_GUID, (void**)&LoadedImage);
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FS;
@@ -605,7 +646,7 @@ void Boot(EFI_HANDLE ImageHandle) {
     EFI_FILE_PROTOCOL *Root;
     FS->OpenVolume(FS, &Root);
 
-    // 2. Load Kernel to RAM
+    // 2. Load Kernel to RAM Buffer
     void *KernelBuffer; UINTN KernelSize;
     if (EFI_ERROR(ReadFile(Root, E->Kernel, (char**)&KernelBuffer, &KernelSize))) {
         ST->ConOut->OutputString(ST->ConOut, CAST_STR(L"Error: Kernel not found.\r\n"));
@@ -620,28 +661,31 @@ void Boot(EFI_HANDLE ImageHandle) {
 
     EFI_LOADED_IMAGE_PROTOCOL *KernelLoaded;
     BS->HandleProtocol(KernelHandle, (EFI_GUID*)&EFI_LOADED_IMAGE_PROTOCOL_GUID, (void**)&KernelLoaded);
-    // Since asterboot loads directly to ram, the firmware gave the kernel a NULL DeviceHandle
-    // So DeviceHandle has to be manually copied to the Kernel so it knows where to read initramfs from
-    KernelLoaded->DeviceHandle = LoadedImage->DeviceHandle; // Handle Injection
 
-    // 5. Set Command Line
-    CHAR16 CmdLine[512]; CHAR16 *D=CmdLine, *S=E->Params;
-    while(*S) *D++=*S++;
+    /* * --- HANDLE INJECTION ---
+     * Since the kernel was loaded from a RAM buffer, the firmware provides it with a NULL DeviceHandle.
+     * This prevents the Kernel's EFI Stub from accessing the disk to load the initramfs.
+     * The solution is to manually inject a DeviceHandle (the Disk) into the Kernel's image structure.
+     */
+    KernelLoaded->DeviceHandle = LoadedImage->DeviceHandle;
 
-    // Append Initrd
+    // 4. Set Command Line (Kernel Params + Initrd)
+    CHAR16 CmdLine[512]; CHAR16 *D = CmdLine, *S = E->Params;
+    while (*S) *D++ = *S++;
+
     if (StrLen(E->Initrd) > 0) {
-        CHAR16 *I=CAST_STR(L" initrd="); while(*I) *D++=*I++;
-        S=E->Initrd; while(*S) *D++=*S++;
+        CHAR16 *I = CAST_STR(L" initrd="); while (*I) *D++ = *I++;
+        S = E->Initrd; while (*S) *D++ = *S++;
     }
-    *D=0;
+    *D = 0;
 
-    KernelLoaded->LoadOptionsSize = (StrLen(CmdLine)+1)*2;
+    KernelLoaded->LoadOptionsSize = (StrLen(CmdLine) + 1) * 2;
     KernelLoaded->LoadOptions = CmdLine;
 
-    // 6. Start
+    // 5. Handover Control
     Status = BS->StartImage(KernelHandle, NULL, NULL);
 
-    // Failure handling
+    // If execution reaches here, the kernel failed to boot
     ST->ConOut->OutputString(ST->ConOut, CAST_STR(L"Kernel Returned\r\n"));
     BS->Stall(5000000);
 }
@@ -653,9 +697,11 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable
 
     ST->ConOut->Reset(ST->ConOut, FALSE);
     BS->SetWatchdogTimer(0, 0, 0, NULL);
+
     SetBestResolution();
     ST->ConOut->EnableCursor(ST->ConOut, FALSE);
 
+    /* Self-Location: Find the device this bootloader is running on */
     EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
     if (EFI_ERROR(BS->HandleProtocol(ImageHandle, (EFI_GUID*)&EFI_LOADED_IMAGE_PROTOCOL_GUID, (void**)&LoadedImage))) return 0;
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FS;
@@ -666,17 +712,20 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable
     DetectRoot(Root);
     LoadAll(Root);
 
-    for(UINTN i=0; i<EntryCount; i++) {
-        if(StrCmp(Entries[i].FileName, Config.DefaultSlot) == 0) SelectedIndex = i;
+    // Set Selection
+    for (UINTN i = 0; i < EntryCount; i++) {
+        if (StrCmp(Entries[i].FileName, Config.DefaultSlot) == 0) SelectedIndex = i;
     }
+    // Adjust scroll window if default is off-screen
     if (SelectedIndex >= MAX_VISIBLE) WindowStart = SelectedIndex - MAX_VISIBLE + 1;
 
+    // Countdown Loop
     UINTN Timer = Config.Timeout;
     BOOLEAN Auto = TRUE;
     EFI_INPUT_KEY Key;
 
     if (Timer == 0) {
-        BS->Stall(100000);
+        BS->Stall(100000); // Brief wait to catch input
         if (!EFI_ERROR(ST->ConIn->ReadKeyStroke(ST->ConIn, &Key)) && Key.UnicodeChar == ' ') {
             Auto = FALSE; Timer = 0;
         } else {
@@ -684,7 +733,7 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable
         }
     }
 
-    while(Timer > 0 && Auto) {
+    while (Timer > 0 && Auto) {
         DrawMenu(Timer);
         BS->Stall(1000000);
         if (!EFI_ERROR(ST->ConIn->ReadKeyStroke(ST->ConIn, &Key))) { Auto = FALSE; break; }
@@ -692,26 +741,32 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable
     }
     if (Auto && EntryCount > 0) Boot(ImageHandle);
 
-    while(1) {
+    // Main UI Loop
+    while (1) {
         DrawMenu(0);
         UINTN Index;
         BS->WaitForEvent(1, (EFI_EVENT*)&ST->ConIn->WaitForKey, &Index);
         ST->ConIn->ReadKeyStroke(ST->ConIn, &Key);
 
-        if (Key.ScanCode == 0x01) {
-            if (SelectedIndex > 0) SelectedIndex--; else SelectedIndex = EntryCount-1;
+        if (Key.ScanCode == 0x01) { // Up
+            if (SelectedIndex > 0) SelectedIndex--; else SelectedIndex = EntryCount - 1;
+            // Scroll logic
             if (SelectedIndex < WindowStart) WindowStart = SelectedIndex;
-            else if (SelectedIndex == EntryCount-1) WindowStart = (EntryCount > MAX_VISIBLE) ? EntryCount - MAX_VISIBLE : 0;
-        }
-        else if (Key.ScanCode == 0x02) {
-            if (SelectedIndex < EntryCount-1) SelectedIndex++; else SelectedIndex = 0;
+            else if (SelectedIndex == EntryCount - 1) WindowStart = (EntryCount > MAX_VISIBLE) ? EntryCount - MAX_VISIBLE : 0;
+        } else if (Key.ScanCode == 0x02) { // Down
+            if (SelectedIndex < EntryCount - 1) SelectedIndex++; else SelectedIndex = 0;
+            // Scroll logic
             if (SelectedIndex >= WindowStart + MAX_VISIBLE) WindowStart++;
             else if (SelectedIndex == 0) WindowStart = 0;
+        } else if (Key.UnicodeChar == 0x0D && EntryCount > 0) {
+            Boot(ImageHandle);
+        } else if (Key.UnicodeChar == 'd' || Key.UnicodeChar == 'D') {
+            WriteDefault(Root);
+        } else if (Key.UnicodeChar == 'u' || Key.UnicodeChar == 'U') {
+            EnterSetup();
+        } else if (Key.ScanCode == 0x17) { // ESC
+            Reboot();
         }
-        else if (Key.UnicodeChar == 0x0D && EntryCount > 0) { Boot(ImageHandle); }
-        else if (Key.UnicodeChar == 'd' || Key.UnicodeChar == 'D') { WriteDefault(Root); }
-        else if (Key.UnicodeChar == 'u' || Key.UnicodeChar == 'U') { EnterSetup(); }
-        else if (Key.ScanCode == 0x17) { Reboot(); }
     }
     return EFI_SUCCESS;
 }
