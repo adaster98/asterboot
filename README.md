@@ -1,7 +1,7 @@
 # Asterboot
 
 Asterboot is an extremely lightweight UEFI bootloader with one job... to boot kernels. <br>
-**13.5KB compiled**. No libraries. No bloat. *Pure **suckless** nature.* <br>
+Now **8KB compiled**! No libraries. No bloat. *Pure **suckless** nature.* <br>
 <sub> Root partition encryption is supported as the initramfs handles decryption, full disk encryption **not** supported. </sub>
 
 ![IMG_1433](https://github.com/user-attachments/assets/22a887d7-cea2-4ec9-81c2-1987cae367fc)
@@ -25,7 +25,8 @@ Use the **precompiled binary** under releases, or you can **build from source** 
 ```shell
 git clone https://github.com/adaster98/asterboot
 cd asterboot
-clang -target x86_64-unknown-windows -ffreestanding -fshort-wchar -mno-red-zone -Wl,-entry:efi_main -fuse-ld=lld -Wl,-subsystem:efi_application -Wl,-nodefaultlib -o asterbootx64.efi main.c
+clang -target x86_64-unknown-windows -ffreestanding -fshort-wchar -mno-red-zone -Wl,-entry:efi_main -fuse-ld=lld -Wl,-subsystem:efi_application -Wl,-nodefaultlib -Oz -o asterbootx64.efi main.c
+llvm-strip asterbootx64.efi
 ```
 
 ## Setup & Configure
