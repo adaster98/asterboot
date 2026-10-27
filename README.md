@@ -1,7 +1,7 @@
 # Asterboot
 
 Asterboot is an extremely lightweight UEFI bootloader with one job... to boot kernels. <br>
-Now **8KB compiled**! No libraries. No bloat. *Pure **suckless** nature.* <br>
+Now **7KB compiled**! No libraries. No bloat. *Pure **suckless** nature.* <br>
 <sub> Root partition encryption is supported as the initramfs handles decryption, full disk encryption **not** supported. </sub>
 
 ![IMG_1433](https://github.com/user-attachments/assets/22a887d7-cea2-4ec9-81c2-1987cae367fc)
